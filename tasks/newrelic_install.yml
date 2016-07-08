@@ -1,0 +1,55 @@
+---
+# tasks file for ansible-role-newrelic
+
+##################################
+# New Relic
+#################################
+
+- include_vars: "defaults/main.yml"
+
+- name: Install GPG key
+  apt_key:
+    url=http://download.newrelic.com/548C16BF.gpg
+    state=present
+  register: gpg_key_installed
+  tags: install
+
+- name: Place repo configuration
+  when: gpg_key_installed|success
+  template:
+    src=newrelic.list.j2
+    dest=/etc/apt/sources.list.d/newrelic.list
+  register: newrelic_repo_installed
+  tags: install
+
+- name: Install New Relic packages
+  when: newrelic_repo_installed|success and {{ ansible_role_newrelic.install }}
+  apt: pkg={{ item }} state=latest update_cache=yes
+  with_items: "{{ ansible_role_newrelic.packages }}"
+  register: newrelic_installed
+  tags: install
+
+- name: Create our new relic log directory
+  file:
+    path=/var/log/newrelic
+    state=directory
+    group=newrelic
+    owner=newrelic
+  tags: install
+
+
+- name: Set the new relic config
+  command: nrsysmond-config --set license_key={{ ansible_role_newrelic.sysmond_key }}
+  notify: restart nrsysmond
+  tags: install
+
+
+#- name: Place New Relic configuration template
+#  when: newrelic_installed|success
+#  template: src=newrelic.ini.j2 dest=/etc/php5/mods-available/newrelic.ini
+#  tags: install
+
+#- name: Enable New Relic php module
+#  shell: /usr/sbin/php5enmod newrelic
+#  notify: restart php-fpm
+#  tags: install

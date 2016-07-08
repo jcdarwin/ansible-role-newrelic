@@ -1,0 +1,14 @@
+---
+# This Playbook deploys newrelic!
+
+- hosts: all
+  remote_user: root
+  become: true
+  become_user: root
+  tags: newrelic
+
+  handlers:
+  - include: handlers/main.yml
+
+  tasks:
+  - include: tasks/newrelic_install.yml

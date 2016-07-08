@@ -1,0 +1,15 @@
+---
+# defaults file for ansible-role-newrelic
+
+site:
+  app: site
+  host: localhost.vagrant
+
+ansible_role_newrelic:
+  install: true
+  app: "{{ site.app }}"
+  apm_key: "REPLACE_WITH_REAL_KEY"
+  sysmond_key: "REPLACE_WITH_REAL_KEY"
+  packages:
+    - newrelic-sysmond
+#    - newrelic-php5
