@@ -37,12 +37,10 @@
     owner=newrelic
   tags: install
 
-
 - name: Set the new relic config
   command: nrsysmond-config --set license_key={{ ansible_role_newrelic.sysmond_key }}
   notify: restart nrsysmond
   tags: install
-
 
 #- name: Place New Relic configuration template
 #  when: newrelic_installed|success
